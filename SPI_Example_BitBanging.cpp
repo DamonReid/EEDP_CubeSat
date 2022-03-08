@@ -13,6 +13,8 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* Damon Reid - CubePilot Australia */
+
 #include "AP_WindVane_SSI.h"
 #include <AP_HAL/AP_HAL.h>
 
