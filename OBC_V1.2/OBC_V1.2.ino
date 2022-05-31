@@ -53,10 +53,7 @@ void loop() {
 String testSwitch(String command){
   int setVal;
   char axis;
-  if(command.indexOf("set version") > 0){
-    return("ok, " + version + "\n");
-  }
-  else if(command.indexOf("get pmag") > 0){
+  if(command.indexOf("get pmag") == 0){
     axis = command.charAt(9);
     switch (axis){
     case: 'x'
@@ -67,7 +64,7 @@ String testSwitch(String command){
       return("ok, " + pz + "\n");
     }
   }
-  else if(command.indexOf("get smag") > 0){
+  else if(command.indexOf("get smag") == 0){
     axis = command.charAt(9);
     switch(axis){
     case: 'x'
@@ -78,7 +75,16 @@ String testSwitch(String command){
       return("ok, " + sz + "\n");
     }
   }
-  else if(command.indexOf("set mtr") > 0){
+  else if(command.indexOf("get css") == 0){
+    return("ok, " + V_css + "\n");
+  }
+  else if(command.indexOf("get temp") == 0){
+    return("ok, " + Temp_S + "\n");
+  }
+  else if(command.indexOf("set version") == 0){
+    return("ok, " + version + "\n");
+  }
+  else if(command.indexOf("set mtr") == 0){
     axis = command.charAt(7);
     setVal = command.substring(9,command.length()-3).toInt();
     if(abs(setVal)>100){
@@ -96,22 +102,17 @@ String testSwitch(String command){
       return("ok, " + mz + "\n");
     }
   }
-  switch(command){
-
-
-    case: SMT
+  else if(command.indexOf("set mode") == 0){
+    if(command.indexOf("test") == 9){
       test = true;
       return("ok, test\n");
-    case: SMR
+    }
+    else if(command.indexOf("run") == 9){
       test = false;
       return("ok, run\n");
-
-    case: css
-      return("ok, " + V_css + "\n");
-    case: temp
-      return("ok, " + Temp_S + "\n");
-    default:
-      return "fail, 1";
-
+    } 
+  }
+  else{
+    return "fail, 1";
   }
 }
