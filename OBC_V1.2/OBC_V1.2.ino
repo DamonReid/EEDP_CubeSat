@@ -30,13 +30,15 @@ enum inputs{
 }
 
 
+
+
 boolean test;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   test = true;
-  
+
 }
 
 void loop() {
@@ -46,7 +48,7 @@ void loop() {
     while(!Serial.available()){}
     Serial.print(testSwitch(Serial.readString()));
   }
-  
+
 }
 String testSwitch(String command){
   int setVal;
@@ -60,7 +62,7 @@ String testSwitch(String command){
     case: 'x'
       return ("ok, " + px + "\n");
     case: 'y'
-      return("ok, " + py + "\n");  
+      return("ok, " + py + "\n");
     case: 'z'
       return("ok, " + pz + "\n");
     }
@@ -80,8 +82,8 @@ String testSwitch(String command){
     axis = command.charAt(7);
     setVal = command.substring(9,command.length()-3).toInt();
     if(abs(setVal)>100){
-     axis = 'e'; 
-    } 
+     axis = 'e';
+    }
     switch(axis){
       case: 'x'
       mx = setVal;
@@ -92,24 +94,24 @@ String testSwitch(String command){
     case: 'z'
       mz = setVal;
       return("ok, " + mz + "\n");
-    } 
+    }
   }
   switch(command){
-    
-    
+
+
     case: SMT
       test = true;
       return("ok, test\n");
     case: SMR
       test = false;
       return("ok, run\n");
-    
+
     case: css
       return("ok, " + V_css + "\n");
     case: temp
       return("ok, " + Temp_S + "\n");
     default:
       return "fail, 1";
-      
-  } 
+
+  }
 }
