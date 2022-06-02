@@ -1,4 +1,5 @@
 boolean test;
+char buffer[15]
 
 void setup() {
   // put your setup code here, to run once:
@@ -22,22 +23,22 @@ String testSwitch(String command){
   if(command.indexOf("get pmag") == 0){
     axis = command.charAt(9);
     switch (axis){
-    case: 'x'
+    case 'x':
       return ("ok, " + px + "\n");
-    case: 'y'
+    case 'y':
       return("ok, " + py + "\n");
-    case: 'z'
+    case 'z':
       return("ok, " + pz + "\n");
     }
   }
   else if(command.indexOf("get smag") == 0){
     axis = command.charAt(9);
     switch(axis){
-    case: 'x'
+    case 'x':
       return("ok, " + sx + "\n");
-    case: 'y'
+    case 'y':
       return("ok, " + sy + "\n");
-    case: 'z'
+    case 'z':
       return("ok, " + sz + "\n");
     }
   }
@@ -52,20 +53,21 @@ String testSwitch(String command){
   }
   else if(command.indexOf("set mtr") == 0){
     axis = command.charAt(7);
-    setVal = command.substring(9,command.length()-3).toInt();
+    setVal = command.substring(9,command.length()-3).toFloat();
     if(abs(setVal)>100){
      axis = 'e';
     }
     switch(axis){
-      case: 'x'
-      mx = setVal;
-      return("ok, " + mx + "\n");
-    case: 'y'
-      my = setVal;
-      return("ok, " + my + "\n");
-    case: 'z'
-      mz = setVal;
-      return("ok, " + mz + "\n");
+      case 'x':
+        float mx = setVal;  
+        return("ok, " + mx + "\n");
+      case 'y':
+        float my = setVal;
+        return("ok, " + my + "\n");
+      case 'z':
+        float mz = setVal;
+        return("ok, " + mz + "\n");
+      default:
     }
   }
   else if(command.indexOf("set mode") == 0){
