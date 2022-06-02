@@ -38,13 +38,11 @@ void loop() {
             Serial.println(z_value);
 
             Serial.println();
-            Serial.println();
 
-            readString=""; //clears variable for new input
-            angle="";
-            fuel="";
-            speed1="";
-            altidude="";
+            readString = ""; //clears variable for new input
+            x_value = "";
+            y_value = "";
+            z_value = "";
         }
         else {
             readString += c; //makes the string readString
