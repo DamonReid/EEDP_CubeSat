@@ -1,37 +1,3 @@
-String GV = "get version\n";
-String GPX = "get pmag x\n";
-String GPY = "get pmag y\n";
-String GPZ = "get pmag z\n";
-String GSX = "get smag x\n";
-String GSY = "get smag y\n";
-String GSZ = "get smag z\n";
-String SMT = "set mode test\n";
-String SMR = "set mode run\n";
-String SMTRX = "set mtrx";
-String SMTRY = "set mtry";
-String SMTRZ = "set mtrz";
-String GCSS = "get css\n";
-String GTEMP = "get temp\n";
-enum inputs{
-  GV,
-  "get pmag x\n",
-  "get pmag y\n",
-  "get pmag z\n",
-  "get smag x\n",
-  "get smag y\n",
-  "get smag z\n",
-  "set mode test\n",
-  "set mode run\n",
-  "set mtrx",
-  "set mtry",
-  "set mtrz",
-  "get css\n",
-  "get temp\n",
-}
-
-
-
-
 boolean test;
 
 void setup() {
