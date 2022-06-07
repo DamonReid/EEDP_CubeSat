@@ -1,10 +1,15 @@
 boolean test;
 char buffer[15]
+char serialIn[100];
+float xVal;
+float yVal;
+float zVal;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   test = true;
+  float systemVersion = 1.2;
 
 }
 
@@ -24,10 +29,13 @@ String testSwitch(String command){
     axis = command.charAt(9);
     switch (axis){
     case 'x':
+      px = getPmag('x');
       return ("ok, " + px + "\n");
     case 'y':
+      py = getPmag('y');
       return("ok, " + py + "\n");
     case 'z':
+      pz = getPmag('z');
       return("ok, " + pz + "\n");
     }
   }
@@ -35,21 +43,26 @@ String testSwitch(String command){
     axis = command.charAt(9);
     switch(axis){
     case 'x':
+      //sx = getSmag('x');
       return("ok, " + sx + "\n");
     case 'y':
+      //sy = getSmag('y');
       return("ok, " + sy + "\n");
     case 'z':
+      //sz = getSmag('z');
       return("ok, " + sz + "\n");
     }
   }
   else if(command.indexOf("get css") == 0){
+    //V_css = getCSS();
     return("ok, " + V_css + "\n");
   }
   else if(command.indexOf("get temp") == 0){
+    //Temp_S = getTemp();
     return("ok, " + Temp_S + "\n");
   }
-  else if(command.indexOf("set version") == 0){
-    return("ok, " + version + "\n");
+  else if(command.indexOf("get version") == 0){
+    return("ok, " + systemVersion + "\n");
   }
   else if(command.indexOf("set mtr") == 0){
     axis = command.charAt(7);
@@ -59,7 +72,7 @@ String testSwitch(String command){
     }
     switch(axis){
       case 'x':
-        float mx = setVal;  
+        float mx = setVal;
         return("ok, " + mx + "\n");
       case 'y':
         float my = setVal;
@@ -67,7 +80,6 @@ String testSwitch(String command){
       case 'z':
         float mz = setVal;
         return("ok, " + mz + "\n");
-      default:
     }
   }
   else if(command.indexOf("set mode") == 0){
@@ -78,9 +90,129 @@ String testSwitch(String command){
     else if(command.indexOf("run") == 9){
       test = false;
       return("ok, run\n");
-    } 
+    }
   }
   else{
     return "fail, 1";
+  }
+}
+
+float getPmag(char axis){
+  while (!Serial.available()) {}
+  int input = Serial.readBytesUntil('\n', serialIn, sizeof(serialIn) - 1);
+
+  Serial.println();
+  Serial.print("Captured String is ");
+  Serial.println(serialIn); //prints string to serial port out
+
+  char *in1 = strtok(serialIn, ",");
+  String i1 = String(in1);
+  Serial.println(in1);
+
+  char *in2 = strtok(NULL,  ",");
+  String i2 = String(in2);
+  Serial.println(in2);
+
+  char *in3 = strtok(NULL,  ",");
+  String i3 = String(in3);
+  Serial.println(in3);
+
+  switch (pmagAxis) {
+    case 'x':
+      if (i1.charAt(0) == 'x') {
+        char *xLoc = strtok(in1, ": ");
+        char *xLoc1 = strtok(NULL, " ");
+        String xRoot =  String(xLoc1);
+        xRoot.substring(4, sizeof(xRoot) - 1);
+
+        Serial.println(xRoot);
+        xVal = xRoot.toFloat();
+      }
+      else if (i2.charAt(0) == 'x' || i2.charAt(1) == 'x') {
+        char *xLoc = strtok(in2, ": ");
+        char *xLoc1 = strtok(NULL, " ");
+        String xRoot =  String(xLoc1);
+        xRoot.substring(4, sizeof(xRoot) - 1);
+
+        Serial.println(xRoot);
+        xVal = xRoot.toFloat();
+      }
+      else if (i3.charAt(0) == 'x' || i3.charAt(1) == 'x') {
+        char *xLoc = strtok(in3, ": ");
+        char *xLoc1 = strtok(NULL, " ");
+        String xRoot =  String(xLoc1);
+        xRoot.substring(4, sizeof(xRoot) - 1);
+
+        Serial.println(xRoot);
+        xVal = xRoot.toFloat();
+      }
+
+      return xVal;
+
+    case 'y':
+      if (i1.charAt(0) == 'y') {
+        char *yLoc = strtok(in1, ": ");
+        char *yLoc1 = strtok(NULL, " ");
+        String yRoot =  String(yLoc1);
+        yRoot.substring(4, sizeof(yRoot) - 1);
+
+        Serial.println(yRoot);
+        yVal = yRoot.toFloat();
+      }
+      else if (i2.charAt(0) == 'y' || i2.charAt(1) == 'y') {
+        char *yLoc = strtok(in2, ": ");
+        char *yLoc1 = strtok(NULL, " ");
+        String yRoot =  String(yLoc1);
+        yRoot.substring(4, sizeof(yRoot) - 1);
+
+        Serial.println(yRoot);
+        yVal = yRoot.toFloat();
+      }
+      else if (i3.charAt(0) == 'y' || i3.charAt(1) == 'y') {
+        char *yLoc = strtok(in3, ": ");
+        char *yLoc1 = strtok(NULL, " ");
+        String yRoot =  String(yLoc1);
+        yRoot.substring(4, sizeof(yRoot) - 1);
+
+        Serial.println(yRoot);
+        yVal = yRoot.toFloat();
+      }
+
+      return yVal;
+
+    case 'z':
+      if (i1.charAt(0) == 'z') {
+        char *zLoc = strtok(in1, ": ");
+        char *zLoc1 = strtok(NULL, " ");
+        String zRoot =  String(zLoc1);
+        zRoot.substring(4, sizeof(zRoot) - 1);
+
+        Serial.println(zRoot);
+        zVal = zRoot.toFloat();
+      }
+      else if (i2.charAt(0) == 'z' || i2.charAt(1) == 'z') {
+        char *zLoc = strtok(in2, ": ");
+        char *zLoc1 = strtok(NULL, " ");
+        String zRoot =  String(zLoc1);
+        zRoot.substring(4, sizeof(zRoot) - 1);
+
+        Serial.println(zRoot);
+        zVal = zRoot.toFloat();
+      }
+      else if (i3.charAt(0) == 'x' || i3.charAt(1) == 'z') {
+        char *zLoc = strtok(in3, ": ");
+        char *zLoc1 = strtok(NULL, " ");
+        String zRoot =  String(zLoc1);
+        zRoot.substring(4, sizeof(zRoot) - 1);
+
+        Serial.println(zRoot);
+        zVal = zRoot.toFloat();
+      }
+
+      return zVal;
+
+    default:
+      return "fail, 1";
+
   }
 }
