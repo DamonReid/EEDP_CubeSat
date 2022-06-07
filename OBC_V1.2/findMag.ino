@@ -1,12 +1,13 @@
 String readString; //main captured String
-String x_value;
-String y_value;
-String z_value;
+String angle; //data String
+String fuel;
+String speed1;
+String altidude;
 
-int ind1; // locations
+int ind1; // , locations
 int ind2;
 int ind3;
-int ind4;
+
 
 void setup() {
     Serial.begin(9600);
@@ -18,31 +19,32 @@ void loop() {
         char c = Serial.read();  //gets one byte from serial buffer
         if (c == '\n') {
             Serial.println();
-            Serial.print("Captured String is: ");
+            Serial.print("Captured String is : ");
             Serial.println(readString); //prints string to serial port out
 
             ind1 = readString.indexOf('x:');  //finds location of first ,
+            x_value = readString.substring(0, ind1);   //captures first data String
             ind2 = readString.indexOf('y:', ind1+1 );   //finds location of second ,
+            y_value = readString.substring(ind1+1, ind2+1);   //captures second data String
             ind3 = readString.indexOf('z:', ind2+1 );
-            ind4 = readString.indexOf('\n', ind3+1);
+            z_value = readString.substring(ind2+1, ind3+1);
 
-            x_value = readString.substring(ind1, ind2-1);   //captures first data String
-            y_value = readString.substring(ind2, ind3-1);   //captures second data String
-            z_value = readString.substring(ind3, ind4-1);
-
-            Serial.print("X = ");
-            Serial.println(x_value);
-            Serial.print("Y = ");
-            Serial.println(y_value);
-            Serial.print("Z = ");
-            Serial.println(z_value);
-
+            Serial.print("angle = ");
+            Serial.println(angle);
+            Serial.print("fuel = ");
+            Serial.println(fuel);
+            Serial.print("speed = ");
+            Serial.println(speed1);
+            Serial.print("altidude = ");
+            Serial.println(altidude);
+            Serial.println();
             Serial.println();
 
-            readString = ""; //clears variable for new input
-            x_value = "";
-            y_value = "";
-            z_value = "";
+            readString=""; //clears variable for new input
+            angle="";
+            fuel="";
+            speed1="";
+            altidude="";
         }
         else {
             readString += c; //makes the string readString
