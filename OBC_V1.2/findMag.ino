@@ -24,7 +24,7 @@ void loop() {
             ind1 = readString.indexOf('x:');  //finds location of first ,
             ind2 = readString.indexOf('y:', ind1+1 );   //finds location of second ,
             ind3 = readString.indexOf('z:', ind2+1 );
-            ind4 = readString.indexOf('c', ind3+1);
+            ind4 = readString.indexOf('\n', ind3+1);
 
             x_value = readString.substring(ind1, ind2-1);   //captures first data String
             y_value = readString.substring(ind2, ind3-1);   //captures second data String
