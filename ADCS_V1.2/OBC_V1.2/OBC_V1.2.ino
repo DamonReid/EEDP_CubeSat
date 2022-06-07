@@ -8,7 +8,7 @@ void setup() {
 
 }
 
-void loop() {
+static void loop() {
   // put your main code here, to run repeatedly:
   if(test){
     Serial.print("Please type in your command (Make sure you put /n at the end of your command): ");
