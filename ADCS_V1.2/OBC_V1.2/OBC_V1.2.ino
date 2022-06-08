@@ -22,7 +22,7 @@ static void loop() {
     Serial.print(testSwitch(Serial.readString()));
   }
 }
-i
+
 String testSwitch(String command){
   int setVal;
   char axis;
@@ -99,25 +99,26 @@ String testSwitch(String command){
 }
 
 float getPmag(char axis){
-    float xVal, yVal, zVal;
+  float xVal, yVal, zVal;
+  float xValNew, yValNew, zValNew;
   while (!Serial.available()) {}
   int input = Serial.readBytesUntil('\n', serialIn, sizeof(serialIn) - 1);
 
   Serial.println();
   Serial.print("Captured String is ");
-  Serial.println(serialIn); //prints string to serial port out
+  Serial.println(serialIn); // prints string to serial port out - EM
 
   char *in1 = strtok(serialIn, ",");
   String i1 = String(in1);
-  Serial.println(in1);
+  Serial.println(in1); // test print - EM
 
   char *in2 = strtok(NULL,  ",");
   String i2 = String(in2);
-  Serial.println(in2);
+  Serial.println(in2); // test print - EM
 
   char *in3 = strtok(NULL,  ",");
   String i3 = String(in3);
-  Serial.println(in3);
+  Serial.println(in3); // test print - EM
 
   switch (axis) {
     case 'x':
@@ -126,61 +127,94 @@ float getPmag(char axis){
         char *xLoc1 = strtok(NULL, " ");
         String xRoot =  String(xLoc1);
         xRoot.substring(4, sizeof(xRoot) - 1);
+        Serial.println(xRoot); // Useless, for our view - DJTR
 
-        Serial.println(xRoot);
-        xVal = xRoot.toFloat();
+        xValNew = xRoot.toFloat();
+        if(xVal==NULL){
+            xVal = xValNew;
+        }
+        else if(xValNew/xVal < 1.5 && xValNew/xVal >0.5){
+            xVal = xValNew;
+        }
       }
       else if (i2.charAt(0) == 'x' || i2.charAt(1) == 'x') {
         char *xLoc = strtok(in2, ": ");
         char *xLoc1 = strtok(NULL, " ");
         String xRoot =  String(xLoc1);
         xRoot.substring(4, sizeof(xRoot) - 1);
+        Serial.println(xRoot); // Useless, for our view - DJTR
 
-        Serial.println(xRoot);
-        xVal = xRoot.toFloat();
+        xValNew = xRoot.toFloat();
+        if(xVal==NULL){
+            xVal = xValNew;
+        }
+        else if(xValNew/xVal < 1.5 && xValNew/xVal >0.5){
+            xVal = xValNew;
+        }
       }
       else if (i3.charAt(0) == 'x' || i3.charAt(1) == 'x') {
-        char *xLoc = strtok(in3, ": ");
-        char *xLoc1 = strtok(NULL, " ");
-        String xRoot =  String(xLoc1);
-        xRoot.substring(4, sizeof(xRoot) - 1);
+          char *xLoc = strtok(in3, ": ");
+          char *xLoc1 = strtok(NULL, " ");
+          String xRoot = String(xLoc1);
+          xRoot.substring(4, sizeof(xRoot) - 1);
+          Serial.println(xRoot); // Useless, for our view - DJTR
 
-        Serial.println(xRoot);
-        xVal = xRoot.toFloat();
+          xValNew = xRoot.toFloat();
+          if (xVal == NULL) {
+              xVal = xValNew;
+          } else if (xValNew / xVal < 1.5 && xValNew / xVal > 0.5) {
+              xVal = xValNew;
+          }
       }
-
       return xVal;
 
     case 'y':
-      if (i1.charAt(0) == 'y') {
-        char *yLoc = strtok(in1, ": ");
-        char *yLoc1 = strtok(NULL, " ");
-        String yRoot =  String(yLoc1);
-        yRoot.substring(4, sizeof(yRoot) - 1);
+        if (i1.charAt(0) == 'y') {
+            char *yLoc = strtok(in1, ": ");
+            char *yLoc1 = strtok(NULL, " ");
+            String yRoot = String(yLoc1);
+            yRoot.substring(4, sizeof(yRoot) - 1);
+            Serial.println(yRoot);// Useless, for our view - DJTR
 
-        Serial.println(yRoot);
-        yVal = yRoot.toFloat();
-      }
-      else if (i2.charAt(0) == 'y' || i2.charAt(1) == 'y') {
-        char *yLoc = strtok(in2, ": ");
-        char *yLoc1 = strtok(NULL, " ");
-        String yRoot =  String(yLoc1);
-        yRoot.substring(4, sizeof(yRoot) - 1);
+            yValNew = yRoot.toFloat();
+            if(yVal==NULL){
+                yVal = yValNew;
+            }
+            else if(yValNew/yVal<1.5 && yValNew / yVal>0.5){
+                yVal = yValNew;
+            }
+        }
+        else if (i2.charAt(0) == 'y' || i2.charAt(1) == 'y') {
+            char *yLoc = strtok(in2, ": ");
+            char *yLoc1 = strtok(NULL, " ");
+            String yRoot = String(yLoc1);
+            yRoot.substring(4, sizeof(yRoot) - 1);
+            Serial.println(yRoot);// Useless, for our view - DJTR
 
-        Serial.println(yRoot);
-        yVal = yRoot.toFloat();
-      }
-      else if (i3.charAt(0) == 'y' || i3.charAt(1) == 'y') {
-        char *yLoc = strtok(in3, ": ");
-        char *yLoc1 = strtok(NULL, " ");
-        String yRoot =  String(yLoc1);
-        yRoot.substring(4, sizeof(yRoot) - 1);
+            yValNew = yRoot.toFloat();
+            if(yVal==NULL){
+                yVal = yValNew;
+            }
+            else if(yValNew/yVal<1.5 && yValNew / yVal>0.5){
+                yVal = yValNew;
+            }
+        }
+        else if (i3.charAt(0) == 'y' || i3.charAt(1) == 'y') {
+            char *yLoc = strtok(in3, ": ");
+            char *yLoc1 = strtok(NULL, " ");
+            String yRoot = String(yLoc1);
+            yRoot.substring(4, sizeof(yRoot) - 1);
+            Serial.println(yRoot);// Useless, for our view - DJTR
 
-        Serial.println(yRoot);
-        yVal = yRoot.toFloat();
-      }
-
-      return yVal;
+            yValNew = yRoot.toFloat();
+            if(yVal==NULL){
+                yVal = yValNew;
+            }
+            else if(yValNew/yVal<1.5 && yValNew / yVal>0.5){
+                yVal = yValNew;
+            }
+        }
+        return yVal;
 
     case 'z':
       if (i1.charAt(0) == 'z') {
@@ -188,34 +222,50 @@ float getPmag(char axis){
         char *zLoc1 = strtok(NULL, " ");
         String zRoot =  String(zLoc1);
         zRoot.substring(4, sizeof(zRoot) - 1);
+          Serial.println(zRoot);// Useless, for our view - DJTR
+          zValNew = zRoot.toFloat();
 
-        Serial.println(zRoot);
-        zVal = zRoot.toFloat();
+          if(zVal==NULL){
+              zVal = zValNew;
+          }
+          else if(zValNew/zVal < 1.5 && zValNew/zVal >0.5){
+              zVal = zValNew;
+          }
       }
       else if (i2.charAt(0) == 'z' || i2.charAt(1) == 'z') {
         char *zLoc = strtok(in2, ": ");
         char *zLoc1 = strtok(NULL, " ");
         String zRoot =  String(zLoc1);
         zRoot.substring(4, sizeof(zRoot) - 1);
+        Serial.println(zRoot);// Useless, for our view - DJTR
+        zValNew = zRoot.toFloat();
 
-        Serial.println(zRoot);
-        zVal = zRoot.toFloat();
+        if(zVal==NULL){
+            zVal = zValNew;
+        }
+        else if(zValNew/zVal < 1.5 && zValNew/zVal >0.5){
+            zVal = zValNew;
+        }
       }
       else if (i3.charAt(0) == 'x' || i3.charAt(1) == 'z') {
         char *zLoc = strtok(in3, ": ");
         char *zLoc1 = strtok(NULL, " ");
         String zRoot =  String(zLoc1);
         zRoot.substring(4, sizeof(zRoot) - 1);
+        Serial.println(zRoot);// Useless, for our view - DJTR
+        zValNew = zRoot.toFloat();
 
-        Serial.println(zRoot);
-        zVal = zRoot.toFloat();
+        if(zVal==NULL){
+            zVal = zValNew;
+        }
+        else if(zValNew/zVal < 1.5 && zValNew/zVal >0.5){
+            zVal = zValNew;
+        }
       }
-
       return zVal;
 
     default:
       return "fail, 1";
-
   }
 }
 
