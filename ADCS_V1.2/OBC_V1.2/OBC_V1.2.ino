@@ -1,12 +1,20 @@
 #include <QMC5883LCompass.h>
 
+const String systemVersion = "1.2";
 const char *delimiter = "xyz:\n";
+const float kw = 2.3809*1/100000;
+const float N = 2000;
+const float A = 0.0001;
 
 QMC5883LCompass smag;
 boolean test;
-char buffer[15]
+char buffer[15];
 char serialIn[100];
 float pmag[3] = { NULL };
+float maghist[3] = { NULL };
+float curr[3];
+int CSSPin;
+int tempPin;
 
 void setup() {
   // put your setup code here, to run once:
@@ -20,28 +28,38 @@ void setup() {
 
 static void loop() {
   // put your main code here, to run repeatedly:
-  char *read_from_pmag_serial 
-  getPmag(*read_from_pmag_serial);
+  //char *read_from_pmag_serial 
+  //getPmag(*read_from_pmag_serial);
   if(test){
-    Serial.print("Please type in your command (Make sure you put /n at the end of your command): ");
+    Serial.println("Please type in your command (Make sure you put \n at the end of your command): ");
     while(!Serial.available()){}
     Serial.println(testSwitch(Serial.readString()));
   }
+  else{
+    if(Serial.available()){
+      if(Serial.readString() == "set mode test\n"){
+        test = true;
+        Serial.println("ok, test");
+      }
+    }
+    if(pmag[0] != NULL){
+      bDot();
+    } 
+  }  
 }
 
 String testSwitch(String command){
-  int setVal;
+  float setVal;
   char axis;
   if(command.indexOf("get pmag") == 0){
     axis = command.charAt(9);
     switch (axis){
     case 'x':
-      return ("ok, " + pmag[0]);
+      return ("ok, " + String(pmag[0]));
     case 'y':
-      py = getPmag('y');
-      return("ok, " + pmag[1]);
+      return("ok, " + String(pmag[1]));
     case 'z':
-      return("ok, " + pmag[2]);
+      return("ok, " + String(pmag[2]));
     default:
         return "fail, 1";
     }
@@ -50,25 +68,25 @@ String testSwitch(String command){
     axis = command.charAt(9);
     switch(axis){
     case 'x':
-      sx = getSmag('x');
-      return("ok, " + sx);
+      float sx = getSmag('x');
+      return("ok, " + String(sx));
     case 'y':
-      sy = getSmag('y');
-      return("ok, " + sy);
+      float sy = getSmag('y');
+      return("ok, " + String(sy));
     case 'z':
-      sz = getSmag('z');
-      return("ok, " + sz);
+      float sz = getSmag('z');
+      return("ok, " + String(sz));
     default:
         return "fail, 1";
     }
   }
   else if(command.indexOf("get css") == 0){
-    V_css = getCSS();
-    return("ok, " + V_css);
+    float V_css = getCSS();
+    return("ok, " + String(V_css));
   }
   else if(command.indexOf("get temp") == 0){
-    Temp_S = getTemp();
-    return("ok, " + Temp_S);
+    float Temp_S = getTemp();
+    return("ok, " + String(Temp_S));
   }
   else if(command.indexOf("get version") == 0){
     return("ok, " + systemVersion);
@@ -82,13 +100,13 @@ String testSwitch(String command){
     switch(axis){
       case 'x':
         float mx = setVal;
-        return("ok, " + mx);
+        return("ok, " + String(mx));
       case 'y':
         float my = setVal;
-        return("ok, " + my);
+        return("ok, " + String(my));
       case 'z':
         float mz = setVal;
-        return("ok, " + mz);
+        return("ok, " + String(mz));
       default:
         return "fail, 1";
     }
@@ -96,16 +114,27 @@ String testSwitch(String command){
   else if(command.indexOf("set mode") == 0){
     if(command.indexOf("test") == 9){
       test = true;
-      return("ok, test\n");
+      return("ok, test");
     }
     else if(command.indexOf("run") == 9){
       test = false;
-      return("ok, run\n");
+      return("ok, run");
     }
   }
   else{
     return "fail, 1";
   }
+}
+
+void bDot(){
+  if(maghist[0] != NULL){
+    float k = -kw/(sq(pmag[1])+sq(pmag[2])+sq(pmag[3]));
+    for(int axis = 0; axis<3; axis++){
+      float m = ((pmag[axis]-maghist[axis])*k);
+      curr[axis] = m/(N*A);
+    }
+  }
+  memcpy(maghist,pmag,sizeof pmag);
 }
 
 float setPmag(char *serialIn){
@@ -145,7 +174,6 @@ float getCSS(){
 
 float getSmag(char axis) {
     float xVal, yVal, zVal;
-
     switch (axis) {
         case 'x':
             xVal = smag.getX();
@@ -157,7 +185,7 @@ float getSmag(char axis) {
             zVal = smag.getZ();
             return zVal;
         default:
-            return "fail, 1";
+            return 0;
     }
 }
 
