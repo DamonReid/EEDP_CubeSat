@@ -10,6 +10,7 @@ void setup() {
   Serial.begin(9600);
   test = true;
   float systemVersion = 1.2;
+  int CSSPin = A0; // change as required
 
 }
 
@@ -54,7 +55,7 @@ String testSwitch(String command){
     }
   }
   else if(command.indexOf("get css") == 0){
-    //V_css = getCSS();
+    V_css = getCSS();
     return("ok, " + V_css + "\n");
   }
   else if(command.indexOf("get temp") == 0){
@@ -215,4 +216,10 @@ float getPmag(char axis){
       return "fail, 1";
 
   }
+}
+float getCSS(){
+  float value = analogRead(CSSPin);
+  Serial.println(value); // this is a testing placeholder for us atm - DJTR
+  float V_css = value/204.6;
+  return V_css;
 }
