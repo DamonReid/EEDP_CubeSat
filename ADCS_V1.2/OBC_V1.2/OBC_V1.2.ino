@@ -45,13 +45,13 @@ String testSwitch(String command){
     axis = command.charAt(9);
     switch(axis){
     case 'x':
-      //sx = getSmag('x');
+      sx = getSmag('x');
       return("ok, " + sx + "\n");
     case 'y':
-      //sy = getSmag('y');
+      sy = getSmag('y');
       return("ok, " + sy + "\n");
     case 'z':
-      //sz = getSmag('z');
+      sz = getSmag('z');
       return("ok, " + sz + "\n");
     }
   }
