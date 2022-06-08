@@ -2,7 +2,7 @@
 
 void setup() {
     Serial.begin(9600);
-    tempPin = A1;
+    int tempPin = A1;
 }
 void loop() {
     double sensorIn, value, value1, tempVal;
