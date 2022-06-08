@@ -11,7 +11,8 @@ void setup() {
   test = true;
   float systemVersion = 1.2;
   int CSSPin = A0; // change as required
-  smag.init();
+  int tempPin = A1; // change as required
+  smag.init(); // initialises magnetometer chip
 }
 
 static void loop() {
@@ -44,13 +45,13 @@ String testSwitch(String command){
     axis = command.charAt(9);
     switch(axis){
     case 'x':
-      //sx = getSmag('x');
+      sx = getSmag('x');
       return("ok, " + sx + "\n");
     case 'y':
-      //sy = getSmag('y');
+      sy = getSmag('y');
       return("ok, " + sy + "\n");
     case 'z':
-      //sz = getSmag('z');
+      sz = getSmag('z');
       return("ok, " + sz + "\n");
     }
   }
@@ -59,7 +60,7 @@ String testSwitch(String command){
     return("ok, " + V_css + "\n");
   }
   else if(command.indexOf("get temp") == 0){
-    //Temp_S = getTemp();
+    Temp_S = getTemp();
     return("ok, " + Temp_S + "\n");
   }
   else if(command.indexOf("get version") == 0){
@@ -292,4 +293,15 @@ float getSmag(char axis) {
         default:
             return "fail, 1";
     }
+}
+
+float getTemp(){
+    float sensorIn, value, value1, tempVal;
+
+    sensorIn = analogRead(tempPin);
+    value = (sensorIn/1023)*5;
+    value1 = (5-value)/value*4700;
+    tempVal = 1/(log(value1/10000)/3950 + 1/(25+273.15)) - 273.15;
+
+    return tempVal;
 }
