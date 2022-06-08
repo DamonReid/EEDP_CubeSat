@@ -1,6 +1,7 @@
+#include <SoftwareSerial.h>
 #include <QMC5883LCompass.h>
 
-const String systemVersion = "1.2";
+const String systemVersion = "1.3";
 const char *delimiter = "xyz:\n";
 const float kw = 2.3809*1/100000;
 const float N = 2000;
@@ -8,42 +9,69 @@ const float A = 0.0001;
 
 QMC5883LCompass smag;
 boolean test;
-char buffer[15];
 char serialIn[100];
 float pmag[3] = { NULL };
 float maghist[3] = { NULL };
-float curr[3];
+float curr[3] = { NULL };
+
+//pins
+int mtrX;
+int mtrY;
+int mtrZ;
 int CSSPin;
 int tempPin;
+int OBCtransmit;
+SoftwareSerial Mag(18, 19); //RX, TX
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  Mag.begin(9600);
   test = true;
-  float systemVersion = 1.2;
-  int CSSPin = A0; // change as required
-  int tempPin = A1; // change as required
+  CSSPin = A0; // change as required
+  tempPin = A1; // change as required
+  OBCtransmit = 14;
   smag.init(); // initialises magnetometer chip
 }
 
 static void loop() {
   // put your main code here, to run repeatedly:
-  //char *read_from_pmag_serial 
-  //getPmag(*read_from_pmag_serial);
+  if(Mag.available()){
+   setPmag(Mag.readBytesUntil('\n', serialIn, sizeof(serialIn) - 1));
+  }
   if(test){
-    Serial.println("Please type in your command (Make sure you put \n at the end of your command): ");
-    while(!Serial.available()){}
-    Serial.println(testSwitch(Serial.readString()));
+    OBCtransmit = LOW;
+    //Serial.println("Please type in your command (Make sure you put \n at the end of your command): ");
+    if(Serial.available()){
+    String serialReturn = testSwitch(Serial.readString());
+    OBCtransmit = HIGH;
+    Serial.println(serialReturn);
+    delay(5);
+    OBCtransmit = LOW;
+    }
   }
   else{
+    OBCtransmit = LOW;
     if(Serial.available()){
-      if(Serial.readString() == "set mode test\n"){
+      if(Serial.readString().equals("set mode test\n")){
         test = true;
+        OBCtransmit = HIGH;
         Serial.println("ok, test");
+        delay(5);
+        OBCtransmit = LOW;
+      }
+      else{
+        OBCtransmit = HIGH;
+        Serial.println("fail, 1");
+        delay(5);
+        OBCtransmit = LOW;
       }
     }
     if(pmag[0] != NULL){
       bDot();
+      if(curr[0] != NULL){
+        hackySetMTRX();
+      }
     } 
   }  
 }
@@ -99,14 +127,14 @@ String testSwitch(String command){
     }
     switch(axis){
       case 'x':
-        float mx = setVal;
-        return("ok, " + String(mx));
+        curr[0] = setVal/10;
+        return("ok, " + String(setVal));
       case 'y':
-        float my = setVal;
-        return("ok, " + String(my));
+        curr[1] = setVal/10;
+        return("ok, " + String(setVal));
       case 'z':
-        float mz = setVal;
-        return("ok, " + String(mz));
+        curr[2] = setVal/10;
+        return("ok, " + String(setVal));
       default:
         return "fail, 1";
     }
@@ -131,10 +159,32 @@ void bDot(){
     float k = -kw/(sq(pmag[1])+sq(pmag[2])+sq(pmag[3]));
     for(int axis = 0; axis<3; axis++){
       float m = ((pmag[axis]-maghist[axis])*k);
-      curr[axis] = m/(N*A);
-    }
+      float curr = m/(N*A);
+      curr = constrain((curr),-10,10);
+      
+    } 
   }
   memcpy(maghist,pmag,sizeof pmag);
+}
+void setMTR(){
+  int mtr[3];
+  for(int axis = 0; axis<3; axis++){
+    mtr[axis] = map(curr[axis]*100,-1000,1000,0,255);
+  }
+  mtrX.analogWrite(mtr[0]);
+  mtrY.analogWrite(mtr[1]);
+  mtrZ.analogWrite(mtr[2]);
+}
+
+void hackySetMTRX(){
+  if(curr[0]>=0){
+    int forward = map(curr[0]*100,0,1000,0,255);
+    mtrX.analogWrite(forward);
+  }
+  else{
+    int backwards = map(curr[0]*100,-1000,0,0,255);
+    mtrY.analogWrite(backwards);
+  }
 }
 
 float setPmag(char *serialIn){
