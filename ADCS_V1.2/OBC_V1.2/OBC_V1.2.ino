@@ -1,9 +1,9 @@
+#include <QMC5883LCompass.h>
+
+QMC5883LCompass smag;
 boolean test;
 char buffer[15]
 char serialIn[100];
-float xVal;
-float yVal;
-float zVal;
 
 void setup() {
   // put your setup code here, to run once:
@@ -11,7 +11,7 @@ void setup() {
   test = true;
   float systemVersion = 1.2;
   int CSSPin = A0; // change as required
-
+  smag.init();
 }
 
 static void loop() {
@@ -21,8 +21,8 @@ static void loop() {
     while(!Serial.available()){}
     Serial.print(testSwitch(Serial.readString()));
   }
-
 }
+i
 String testSwitch(String command){
   int setVal;
   char axis;
@@ -99,6 +99,7 @@ String testSwitch(String command){
 }
 
 float getPmag(char axis){
+    float xVal, yVal, zVal;
   while (!Serial.available()) {}
   int input = Serial.readBytesUntil('\n', serialIn, sizeof(serialIn) - 1);
 
@@ -118,7 +119,7 @@ float getPmag(char axis){
   String i3 = String(in3);
   Serial.println(in3);
 
-  switch (pmagAxis) {
+  switch (axis) {
     case 'x':
       if (i1.charAt(0) == 'x') {
         char *xLoc = strtok(in1, ": ");
@@ -217,9 +218,28 @@ float getPmag(char axis){
 
   }
 }
+
 float getCSS(){
   float value = analogRead(CSSPin);
   Serial.println(value); // this is a testing placeholder for us atm - DJTR
   float V_css = value/204.6;
   return V_css;
+}
+
+float getSmag(char axis) {
+    float xVal, yVal, zVal;
+
+    switch (axis) {
+        case 'x':
+            xVal = smag.getX();
+            return xVal;
+        case 'y':
+            yVal = smag.getY();
+            return yVal;
+        case 'z':
+            zVal = smag.getZ();
+            return zVal;
+        default:
+            return "fail, 1";
+    }
 }
