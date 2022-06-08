@@ -60,7 +60,7 @@ String testSwitch(String command){
     return("ok, " + V_css + "\n");
   }
   else if(command.indexOf("get temp") == 0){
-    //Temp_S = getTemp();
+    Temp_S = getTemp();
     return("ok, " + Temp_S + "\n");
   }
   else if(command.indexOf("get version") == 0){
