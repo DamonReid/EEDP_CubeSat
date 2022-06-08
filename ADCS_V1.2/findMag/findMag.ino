@@ -1,7 +1,6 @@
+const char *delimiter = "xyz:\n";
 char serialIn[100];
-float xVal;
-float yVal;
-float zVal;
+float pmag[3] = { NULL };
 
 void setup() {
   Serial.begin(9600);
@@ -11,119 +10,63 @@ void setup() {
 void loop() {
   while (!Serial.available()) {}
   int input = Serial.readBytesUntil('\n', serialIn, sizeof(serialIn) - 1);
-
   Serial.println();
   Serial.print("Captured String is ");
   Serial.println(serialIn); //prints string to serial port out
-
-  char *in1 = strtok(serialIn, ",");
-  String i1 = String(in1);
-  Serial.println(in1);
-
-  char *in2 = strtok(NULL,  ",");
-  String i2 = String(in2);
-  Serial.println(in2);
-
-  char *in3 = strtok(NULL,  ",");
-  String i3 = String(in3);
-  Serial.println(in3);
-
-  switch (pmagAxis) {
-    case 'x':
-      if (i1.charAt(0) == 'x') {
-        char *xLoc = strtok(in1, ": ");
-        char *xLoc1 = strtok(NULL, " ");
-        String xRoot =  String(xLoc1);
-        xRoot.substring(4, sizeof(xRoot) - 1);
-
-        Serial.println(xRoot);
-        xVal = xRoot.toFloat();
+  if(serialIn[0] == 'x'){
+    float newMag[3];
+    char *in1 = strtok(serialIn, delimiter);
+    newMag[0] = atof(in1);
+    char *in2 = strtok(NULL, delimiter);
+    newMag[1] = atof(in2);
+    char *in3 = strtok(NULL, delimiter);
+    newMag[2] = atof(in3);
+    if(pmag[0] == NULL){ 
+      memcpy(pmag,newMag,sizeof newMag); 
+    }
+    else{
+      for(int i = 0; i<3; i++){
+        if(abs(newMag[i]-pmag[i])>(pmag[i]/2)){
+          Serial.println("Incorrect input, mag value has changed by more than 0.5x");
+          return;
+        }  
       }
-      else if (i2.charAt(0) == 'x' || i2.charAt(1) == 'x') {
-        char *xLoc = strtok(in2, ": ");
-        char *xLoc1 = strtok(NULL, " ");
-        String xRoot =  String(xLoc1);
-        xRoot.substring(4, sizeof(xRoot) - 1);
+      memcpy(pmag,newMag,sizeof newMag);
+    }
+  }
+  else{
+    Serial.println("Incorrect input");
+    return;
+  }
+  for(int i = 0; i<3; i++){
+    Serial.println(pmag[i]);
+  }
+}
 
-        Serial.println(xRoot);
-        xVal = xRoot.toFloat();
+void setMagValues(char *serialIn){
+  if(serialIn[0] == 'x'){
+    float newMag[3];
+    char *in1 = strtok(serialIn, delimiter);
+    newMag[0] = atof(in1);
+    char *in2 = strtok(NULL, delimiter);
+    newMag[1] = atof(in2);
+    char *in3 = strtok(NULL, delimiter);
+    newMag[2] = atof(in3);
+    if(pmag[0] == NULL){ 
+      memcpy(pmag,newMag,sizeof newMag); 
+    }
+    else{
+      for(int i = 0; i<3; i++){
+        if(abs(newMag[i]-pmag[i])>(pmag[i]/2)){
+          Serial.println("Incorrect input, mag value has changed by more than 0.5x");
+          return;
+        }  
       }
-      else if (i3.charAt(0) == 'x' || i3.charAt(1) == 'x') {
-        char *xLoc = strtok(in3, ": ");
-        char *xLoc1 = strtok(NULL, " ");
-        String xRoot =  String(xLoc1);
-        xRoot.substring(4, sizeof(xRoot) - 1);
-
-        Serial.println(xRoot);
-        xVal = xRoot.toFloat();
-      }
-
-      return xVal;
-
-    case 'y':
-      if (i1.charAt(0) == 'y') {
-        char *yLoc = strtok(in1, ": ");
-        char *yLoc1 = strtok(NULL, " ");
-        String yRoot =  String(yLoc1);
-        yRoot.substring(4, sizeof(yRoot) - 1);
-
-        Serial.println(yRoot);
-        yVal = yRoot.toFloat();
-      }
-      else if (i2.charAt(0) == 'y' || i2.charAt(1) == 'y') {
-        char *yLoc = strtok(in2, ": ");
-        char *yLoc1 = strtok(NULL, " ");
-        String yRoot =  String(yLoc1);
-        yRoot.substring(4, sizeof(yRoot) - 1);
-
-        Serial.println(yRoot);
-        yVal = yRoot.toFloat();
-      }
-      else if (i3.charAt(0) == 'y' || i3.charAt(1) == 'y') {
-        char *yLoc = strtok(in3, ": ");
-        char *yLoc1 = strtok(NULL, " ");
-        String yRoot =  String(yLoc1);
-        yRoot.substring(4, sizeof(yRoot) - 1);
-
-        Serial.println(yRoot);
-        yVal = yRoot.toFloat();
-      }
-
-      return yVal;
-
-    case 'z':
-      if (i1.charAt(0) == 'z') {
-        char *zLoc = strtok(in1, ": ");
-        char *zLoc1 = strtok(NULL, " ");
-        String zRoot =  String(zLoc1);
-        zRoot.substring(4, sizeof(zRoot) - 1);
-
-        Serial.println(zRoot);
-        zVal = zRoot.toFloat();
-      }
-      else if (i2.charAt(0) == 'z' || i2.charAt(1) == 'z') {
-        char *zLoc = strtok(in2, ": ");
-        char *zLoc1 = strtok(NULL, " ");
-        String zRoot =  String(zLoc1);
-        zRoot.substring(4, sizeof(zRoot) - 1);
-
-        Serial.println(zRoot);
-        zVal = zRoot.toFloat();
-      }
-      else if (i3.charAt(0) == 'x' || i3.charAt(1) == 'z') {
-        char *zLoc = strtok(in3, ": ");
-        char *zLoc1 = strtok(NULL, " ");
-        String zRoot =  String(zLoc1);
-        zRoot.substring(4, sizeof(zRoot) - 1);
-
-        Serial.println(zRoot);
-        zVal = zRoot.toFloat();
-      }
-
-      return zVal;
-
-    default:
-      return "fail, 1";
-
+      memcpy(pmag,newMag,sizeof newMag);
+    }
+  }
+  else{
+    Serial.println("Incorrect input");
+    return;
   }
 }
