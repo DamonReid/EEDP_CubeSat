@@ -1,6 +1,16 @@
 #include <SoftwareSerial.h>
 #include <QMC5883LCompass.h>
 
+//pins
+#define mtrX 9 //hacky X+
+#define mtrY 10 //hacky X-
+#define mtrZ 11
+#define CSSPin A0
+#define tempPin A1
+#define OBCtransmit 14
+#define magRX 18
+#define magTX 19
+
 const String systemVersion = "1.3";
 const char *delimiter = "xyz:\n";
 const float kw = 2.3809*1/100000;
@@ -14,57 +24,60 @@ float pmag[3] = { NULL };
 float maghist[3] = { NULL };
 float curr[3] = { NULL };
 
-//pins
-int mtrX;
-int mtrY;
-int mtrZ;
-int CSSPin;
-int tempPin;
-int OBCtransmit;
-SoftwareSerial Mag(18, 19); //RX, TX
+SoftwareSerial Mag = SoftwareSerial(magRX, magTX); //RX, TX
 
 void setup() {
   // put your setup code here, to run once:
+  test = true;
+  pinMode(CSSPin,INPUT);
+  pinMode(tempPin,INPUT);
+  pinMode(OBCtransmit,OUTPUT);
+  pinMode(mtrX,OUTPUT);
+  pinMode(mtrY,OUTPUT);
+  pinMode(mtrZ,OUTPUT);
+  pinMode(magRX,INPUT);
+  pinMode(magTX,OUTPUT);
   Serial.begin(9600);
   Mag.begin(9600);
-  test = true;
-  CSSPin = A0; // change as required
-  tempPin = A1; // change as required
-  OBCtransmit = 14;
   smag.init(); // initialises magnetometer chip
 }
 
 static void loop() {
   // put your main code here, to run repeatedly:
   if(Mag.available()){
-   setPmag(Mag.readBytesUntil('\n', serialIn, sizeof(serialIn) - 1));
+   char *readIn = Mag.readBytesUntil('\n', serialIn, sizeof(serialIn) - 1); 
+   if(readIn[0] == 'x'){
+      Serial.println(String(readIn));
+      setPmag(readIn);
+   }
   }
   if(test){
-    OBCtransmit = LOW;
+    Serial.println("test");
+    digitalWrite(OBCtransmit,LOW);
     //Serial.println("Please type in your command (Make sure you put \n at the end of your command): ");
     if(Serial.available()){
     String serialReturn = testSwitch(Serial.readString());
-    OBCtransmit = HIGH;
+    digitalWrite(OBCtransmit,HIGH);
     Serial.println(serialReturn);
     delay(5);
-    OBCtransmit = LOW;
+    digitalWrite(OBCtransmit,LOW);
     }
   }
   else{
-    OBCtransmit = LOW;
+    digitalWrite(OBCtransmit,LOW);
     if(Serial.available()){
       if(Serial.readString().equals("set mode test\n")){
         test = true;
-        OBCtransmit = HIGH;
+        digitalWrite(OBCtransmit,HIGH);
         Serial.println("ok, test");
         delay(5);
-        OBCtransmit = LOW;
+        digitalWrite(OBCtransmit,LOW);
       }
       else{
-        OBCtransmit = HIGH;
+        digitalWrite(OBCtransmit,HIGH);
         Serial.println("fail, 1");
         delay(5);
-        OBCtransmit = LOW;
+        digitalWrite(OBCtransmit,LOW);
       }
     }
     if(pmag[0] != NULL){
@@ -93,17 +106,19 @@ String testSwitch(String command){
     }
   }
   else if(command.indexOf("get smag") == 0){
-    axis = command.charAt(9);
-    switch(axis){
+    char axis2;
+    axis2 = command.charAt(9);
+    Serial.println(axis2);
+    switch(axis2){
     case 'x':
-      float sx = getSmag('x');
-      return("ok, " + String(sx));
+      Serial.println("getSmag x");
+      return("ok, " + String(smag.getX()));
     case 'y':
-      float sy = getSmag('y');
-      return("ok, " + String(sy));
+      Serial.println("getSmag y");
+      return("ok, " + String(smag.getY()));
     case 'z':
-      float sz = getSmag('z');
-      return("ok, " + String(sz));
+      Serial.println("getSmag z");
+      return("ok, " + String(smag.getZ()));
     default:
         return "fail, 1";
     }
@@ -121,7 +136,8 @@ String testSwitch(String command){
   }
   else if(command.indexOf("set mtr") == 0){
     axis = command.charAt(7);
-    setVal = command.substring(9,command.length()-3).toFloat();
+    String valString = command.substring(9,command.length()-1);
+    setVal = valString.toFloat();
     if(abs(setVal)>100){
      axis = 'e';
     }
@@ -171,19 +187,19 @@ void setMTR(){
   for(int axis = 0; axis<3; axis++){
     mtr[axis] = map(curr[axis]*100,-1000,1000,0,255);
   }
-  mtrX.analogWrite(mtr[0]);
-  mtrY.analogWrite(mtr[1]);
-  mtrZ.analogWrite(mtr[2]);
+  analogWrite(mtrX,mtr[0]);
+  analogWrite(mtrY,mtr[1]);
+  analogWrite(mtrZ,mtr[2]);
 }
 
 void hackySetMTRX(){
   if(curr[0]>=0){
     int forward = map(curr[0]*100,0,1000,0,255);
-    mtrX.analogWrite(forward);
+    analogWrite(mtrX,forward);
   }
   else{
     int backwards = map(curr[0]*100,-1000,0,0,255);
-    mtrY.analogWrite(backwards);
+    analogWrite(mtrY,backwards);
   }
 }
 
@@ -210,29 +226,34 @@ float setPmag(char *serialIn){
     }
   }
   else{
-    Serial.println("Incorrect input");
+    //Serial.println("Incorrect input");
     return;
   }
 }
 
 float getCSS(){
   float value = analogRead(CSSPin);
-  Serial.println(value); // this is a testing placeholder for us atm - DJTR
-  float V_css = value/204.6;
+  //Serial.println(value); // this is a testing placeholder for us atm - DJTR
+  float V_css = value/10.6;
   return V_css;
 }
 
-float getSmag(char axis) {
+float getSmag1(char axis) {
+    Serial.print("smag for ");
+    Serial.println(axis);
     float xVal, yVal, zVal;
     switch (axis) {
         case 'x':
-            xVal = smag.getX();
+            xVal = 2; //smag.getX();
+            Serial.println("xVal: " + String(xVal));
             return xVal;
         case 'y':
-            yVal = smag.getY();
+            yVal = 3; //smag.getY();
+            Serial.println("yVal: " + String(yVal));
             return yVal;
         case 'z':
-            zVal = smag.getZ();
+            zVal = 4; //smag.getZ();
+            Serial.println("zVal: " + String(zVal));
             return zVal;
         default:
             return 0;

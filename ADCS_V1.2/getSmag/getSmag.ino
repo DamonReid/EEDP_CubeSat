@@ -4,7 +4,7 @@ QMC5883LCompass smag;
 
 void setup() {
     Serial.begin(9600);
-    compass.init();
+    smag.init();
 }
 
 void loop() {
